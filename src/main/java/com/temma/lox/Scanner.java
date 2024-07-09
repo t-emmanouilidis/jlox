@@ -1,43 +1,4 @@
-package com.temma.interpreter.crafting;
-
-import static com.temma.interpreter.crafting.TokenType.AND;
-import static com.temma.interpreter.crafting.TokenType.BANG;
-import static com.temma.interpreter.crafting.TokenType.BANG_EQUAL;
-import static com.temma.interpreter.crafting.TokenType.CLASS;
-import static com.temma.interpreter.crafting.TokenType.COMMA;
-import static com.temma.interpreter.crafting.TokenType.DOT;
-import static com.temma.interpreter.crafting.TokenType.ELSE;
-import static com.temma.interpreter.crafting.TokenType.EQUAL;
-import static com.temma.interpreter.crafting.TokenType.EQUAL_EQUAL;
-import static com.temma.interpreter.crafting.TokenType.FALSE;
-import static com.temma.interpreter.crafting.TokenType.FOR;
-import static com.temma.interpreter.crafting.TokenType.FUN;
-import static com.temma.interpreter.crafting.TokenType.GREATER;
-import static com.temma.interpreter.crafting.TokenType.GREATER_EQUAL;
-import static com.temma.interpreter.crafting.TokenType.IDENTIFIER;
-import static com.temma.interpreter.crafting.TokenType.IF;
-import static com.temma.interpreter.crafting.TokenType.LEFT_BRACE;
-import static com.temma.interpreter.crafting.TokenType.LEFT_PAREN;
-import static com.temma.interpreter.crafting.TokenType.LESS;
-import static com.temma.interpreter.crafting.TokenType.LESS_EQUAL;
-import static com.temma.interpreter.crafting.TokenType.MINUS;
-import static com.temma.interpreter.crafting.TokenType.NIL;
-import static com.temma.interpreter.crafting.TokenType.NUMBER;
-import static com.temma.interpreter.crafting.TokenType.OR;
-import static com.temma.interpreter.crafting.TokenType.PLUS;
-import static com.temma.interpreter.crafting.TokenType.PRINT;
-import static com.temma.interpreter.crafting.TokenType.RETURN;
-import static com.temma.interpreter.crafting.TokenType.RIGHT_BRACE;
-import static com.temma.interpreter.crafting.TokenType.RIGHT_PAREN;
-import static com.temma.interpreter.crafting.TokenType.SEMICOLON;
-import static com.temma.interpreter.crafting.TokenType.SLASH;
-import static com.temma.interpreter.crafting.TokenType.STAR;
-import static com.temma.interpreter.crafting.TokenType.STRING;
-import static com.temma.interpreter.crafting.TokenType.SUPER;
-import static com.temma.interpreter.crafting.TokenType.THIS;
-import static com.temma.interpreter.crafting.TokenType.TRUE;
-import static com.temma.interpreter.crafting.TokenType.VAR;
-import static com.temma.interpreter.crafting.TokenType.WHILE;
+package com.temma.lox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,22 +7,22 @@ import java.util.Map;
 class Scanner {
 
     private static final Map<String, TokenType> KEYWORDS = Map.ofEntries(
-          Map.entry("and", AND),
-          Map.entry("class", CLASS),
-          Map.entry("else", ELSE),
-          Map.entry("false", FALSE),
-          Map.entry("for", FOR),
-          Map.entry("fun", FUN),
-          Map.entry("if", IF),
-          Map.entry("nil", NIL),
-          Map.entry("or", OR),
-          Map.entry("print", PRINT),
-          Map.entry("return", RETURN),
-          Map.entry("super", SUPER),
-          Map.entry("this", THIS),
-          Map.entry("true", TRUE),
-          Map.entry("var", VAR),
-          Map.entry("while", WHILE));
+          Map.entry("and", TokenType.AND),
+          Map.entry("class", TokenType.CLASS),
+          Map.entry("else", TokenType.ELSE),
+          Map.entry("false", TokenType.FALSE),
+          Map.entry("for", TokenType.FOR),
+          Map.entry("fun", TokenType.FUN),
+          Map.entry("if", TokenType.IF),
+          Map.entry("nil", TokenType.NIL),
+          Map.entry("or", TokenType.OR),
+          Map.entry("print", TokenType.PRINT),
+          Map.entry("return", TokenType.RETURN),
+          Map.entry("super", TokenType.SUPER),
+          Map.entry("this", TokenType.THIS),
+          Map.entry("true", TokenType.TRUE),
+          Map.entry("var", TokenType.VAR),
+          Map.entry("while", TokenType.WHILE));
 
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
@@ -86,46 +47,46 @@ class Scanner {
         char c = advance();
         switch (c) {
             case '(':
-                addToken(LEFT_PAREN);
+                addToken(TokenType.LEFT_PAREN);
                 break;
             case ')':
-                addToken(RIGHT_PAREN);
+                addToken(TokenType.RIGHT_PAREN);
                 break;
             case '{':
-                addToken(LEFT_BRACE);
+                addToken(TokenType.LEFT_BRACE);
                 break;
             case '}':
-                addToken(RIGHT_BRACE);
+                addToken(TokenType.RIGHT_BRACE);
                 break;
             case ',':
-                addToken(COMMA);
+                addToken(TokenType.COMMA);
                 break;
             case '.':
-                addToken(DOT);
+                addToken(TokenType.DOT);
                 break;
             case '-':
-                addToken(MINUS);
+                addToken(TokenType.MINUS);
                 break;
             case '+':
-                addToken(PLUS);
+                addToken(TokenType.PLUS);
                 break;
             case ';':
-                addToken(SEMICOLON);
+                addToken(TokenType.SEMICOLON);
                 break;
             case '*':
-                addToken(STAR);
+                addToken(TokenType.STAR);
                 break;
             case '!':
-                addToken(matchNext('=') ? BANG_EQUAL : BANG);
+                addToken(matchNext('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                 break;
             case '=':
-                addToken(matchNext('=') ? EQUAL_EQUAL : EQUAL);
+                addToken(matchNext('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
                 break;
             case '<':
-                addToken(matchNext('<') ? LESS_EQUAL : LESS);
+                addToken(matchNext('<') ? TokenType.LESS_EQUAL : TokenType.LESS);
                 break;
             case '>':
-                addToken(matchNext('>') ? GREATER_EQUAL : GREATER);
+                addToken(matchNext('>') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                 break;
             case '/':
                 if (matchNext('/')) {
@@ -133,7 +94,7 @@ class Scanner {
                         advance();
                     }
                 } else {
-                    addToken(SLASH);
+                    addToken(TokenType.SLASH);
                 }
                 break;
             case ' ':
@@ -165,7 +126,7 @@ class Scanner {
         String text = source.substring(start, current);
         TokenType type = KEYWORDS.get(text);
         if (type == null) {
-            type = IDENTIFIER;
+            type = TokenType.IDENTIFIER;
         }
         addToken(type);
     }
@@ -193,7 +154,7 @@ class Scanner {
             }
         }
 
-        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+        addToken(TokenType.NUMBER, Double.parseDouble(source.substring(start, current)));
     }
 
     private boolean isDigit(char c) {
@@ -216,7 +177,7 @@ class Scanner {
         advance();
 
         String value = source.substring(start + 1, current - 1);
-        addToken(STRING, value);
+        addToken(TokenType.STRING, value);
     }
 
     private char peek() {

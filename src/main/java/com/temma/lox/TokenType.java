@@ -1,4 +1,4 @@
-package com.temma.interpreter.crafting;
+package com.temma.lox;
 
 public enum TokenType {
     // Single-character tokens.

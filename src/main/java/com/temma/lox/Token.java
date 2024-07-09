@@ -1,4 +1,4 @@
-package com.temma.interpreter.crafting;
+package com.temma.lox;
 
 class Token {
     final TokenType type;
