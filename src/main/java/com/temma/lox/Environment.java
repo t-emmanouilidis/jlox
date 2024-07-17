@@ -11,4 +11,12 @@ public class Environment {
         this.values.put(name, value);
     }
 
+    Object get(Token name) {
+        Object value = values.get(name.lexeme);
+        if (value == null) {
+            throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'");
+        }
+        return value;
+    }
+
 }

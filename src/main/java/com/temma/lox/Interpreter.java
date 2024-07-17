@@ -4,6 +4,8 @@ import java.util.List;
 
 class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 
+    private final Environment environment = new Environment();
+
     void interpret(List<Stmt> statements) {
         try {
             for (Stmt statement : statements) {
@@ -95,15 +97,29 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
     }
 
     @Override
-    public Void visitPrintStmt(Print stmt) {
-        Object value = stmt.value().accept(this);
-        System.out.println(stringify(value));
-        return null;
+    public void visitVariableDeclaration(VarDeclaration stmt) {
+        Object value = null;
+        if (stmt.initializer() != null) {
+            value = stmt.initializer().accept(this);
+        }
+
+        environment.define(stmt.name().lexeme, value);
     }
 
     @Override
-    public Void visitExpressionStmt(ExpressionStmt stmt) {
-        return null;
+    public Object visitVariableExpr(Variable variable) {
+        return environment.get(variable.name());
+    }
+
+    @Override
+    public void visitPrintStmt(Print stmt) {
+        Object value = stmt.value().accept(this);
+        System.out.println(stringify(value));
+    }
+
+    @Override
+    public void visitExpressionStmt(ExpressionStmt stmt) {
+        stmt.expression().accept(this);
     }
 
     private void checkNumberOperand(Token operator, Object operand) {

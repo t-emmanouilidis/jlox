@@ -6,8 +6,6 @@ import java.util.List;
 public class Parser {
 
     private static class ParseError extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
     }
 
     private final List<Token> tokens;

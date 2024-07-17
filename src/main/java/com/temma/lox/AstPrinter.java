@@ -31,6 +31,11 @@ class AstPrinter implements ExprVisitor<String> {
         return parenthesize(expr.operator().lexeme, expr.right());
     }
 
+    @Override
+    public String visitVariableExpr(Variable variable) {
+        return "";
+    }
+
     private String parenthesize(String name, Expr... exprs) {
         var sb = new StringBuilder();
         sb.append("(")
