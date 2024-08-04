@@ -144,6 +144,13 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
     }
     
     @Override
+    public void visitWhileStmt(WhileStmt stmt) {
+    	while (isTruthy(evaluate(stmt.condition()))) {
+    		execute(stmt.body());
+    	}
+    }
+    
+    @Override
 	public Object visitLogicalExpr(Logical expr) {
     	Object left = evaluate(expr.left());
     	if (expr.operator().type == TokenType.OR) {

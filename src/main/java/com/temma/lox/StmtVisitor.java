@@ -15,4 +15,6 @@ interface StmtVisitor {
 	void visitBlock(Block block);
 
 	void visitIfStmt(IfStmt ifStmt);
+
+	void visitWhileStmt(WhileStmt whileStmt);
 }
