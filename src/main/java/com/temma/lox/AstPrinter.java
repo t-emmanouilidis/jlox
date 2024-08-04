@@ -33,7 +33,14 @@ class AstPrinter implements ExprVisitor<String> {
 
     @Override
     public String visitVariableExpr(Variable variable) {
-        return "";
+        return variable.name().lexeme;
+    }
+
+    @Override
+    public String visitAssignExpr(Assign assign) {
+        Token name = assign.name();
+        Expr value = assign.value();
+        return name.lexeme + " = " + visit(value);
     }
 
     private String parenthesize(String name, Expr... exprs) {

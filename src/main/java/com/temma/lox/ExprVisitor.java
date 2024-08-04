@@ -15,4 +15,6 @@ interface ExprVisitor<U> {
     U visitUnaryExpr(Unary expr);
 
     U visitVariableExpr(Variable variable);
+
+    U visitAssignExpr(Assign assign);
 }

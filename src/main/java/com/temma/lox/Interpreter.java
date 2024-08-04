@@ -4,12 +4,12 @@ import java.util.List;
 
 class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 
-    private final Environment environment = new Environment();
+    private Environment environment = new Environment();
 
     void interpret(List<Stmt> statements) {
         try {
             for (Stmt statement : statements) {
-                statement.accept(this);
+                execute(statement);
             }
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
@@ -32,8 +32,8 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 
     @Override
     public Object visitBinaryExpr(Binary expr) {
-        Object left = expr.left().accept(this);
-        Object right = expr.right().accept(this);
+        Object left = evaluate(expr.left());
+        Object right = evaluate(expr.right());
 
         switch (expr.operator().type) {
             case BANG_EQUAL:
@@ -75,7 +75,7 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 
     @Override
     public Object visitGroupingExpr(Grouping expr) {
-        return expr.expression().accept(this);
+        return evaluate(expr.expression());
     }
 
     @Override
@@ -85,7 +85,7 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 
     @Override
     public Object visitUnaryExpr(Unary expr) {
-        Object right = expr.right().accept(this);
+        Object right = evaluate(expr.right());
 
         if (expr.operator().type == TokenType.MINUS) {
             checkNumberOperand(expr.operator(), right);
@@ -100,7 +100,7 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
     public void visitVariableDeclaration(VarDeclaration stmt) {
         Object value = null;
         if (stmt.initializer() != null) {
-            value = stmt.initializer().accept(this);
+            value = evaluate(stmt.initializer());
         }
 
         environment.define(stmt.name().lexeme, value);
@@ -112,17 +112,50 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
     }
 
     @Override
+    public Object visitAssignExpr(Assign assign) {
+        Object value = evaluate(assign.value());
+        environment.assign(assign.name(), value);
+        return value;
+    }
+
+    @Override
     public void visitPrintStmt(Print stmt) {
-        Object value = stmt.value().accept(this);
+        Object value = evaluate(stmt.value());
         System.out.println(stringify(value));
     }
 
     @Override
     public void visitExpressionStmt(ExpressionStmt stmt) {
-        stmt.expression().accept(this);
+        evaluate(stmt.expression());
+    }
+    
+    @Override
+	public void visitBlock(Block block) {
+		executeBlock(block.stmts(), new Environment(environment));
+	}
+
+    private void executeBlock(List<Stmt> stmts, Environment environment) {
+		Environment previous = this.environment;
+		try {
+			this.environment = environment;
+			
+			for (Stmt stmt : stmts) {
+				execute(stmt);
+			}
+		} finally {
+			this.environment = previous;
+		}
+	}
+    
+    private void execute(Stmt stmt) {
+    	stmt.accept(this);
+    }
+    
+    private Object evaluate(Expr expr) {
+    	return expr.accept(this);
     }
 
-    private void checkNumberOperand(Token operator, Object operand) {
+	private void checkNumberOperand(Token operator, Object operand) {
         if (operand instanceof Double) {
             return;
         }

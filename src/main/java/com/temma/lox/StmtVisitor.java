@@ -1,6 +1,6 @@
 package com.temma.lox;
 
-public interface StmtVisitor {
+interface StmtVisitor {
 
     default void visit(Stmt stmt) {
         stmt.accept(this);
@@ -11,4 +11,6 @@ public interface StmtVisitor {
     void visitPrintStmt(Print stmt);
 
     void visitVariableDeclaration(VarDeclaration varDeclaration);
+
+	void visitBlock(Block block);
 }

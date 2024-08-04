@@ -6,6 +6,9 @@ import java.util.List;
 public class Parser {
 
     private static class ParseError extends RuntimeException {
+
+		private static final long serialVersionUID = 1L;
+
     }
 
     private final List<Token> tokens;
@@ -49,7 +52,20 @@ public class Parser {
         if (match(TokenType.PRINT)) {
             return printStatement();
         }
+        if (match(TokenType.LEFT_BRACE)) {
+        	return new Block(block());
+        }
         return expressionStatement();
+    }
+    
+    private List<Stmt> block() {
+    	List<Stmt> statements = new ArrayList<>();
+    	
+    	while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
+    		statements.add(declaration());
+    	}
+    	consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+    	return statements;
     }
 
     private Stmt expressionStatement() {
@@ -65,7 +81,24 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+
+    private Expr assignment() {
+        Expr expr = equality();
+
+        if (match(TokenType.EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Variable aVar) {
+                Token name = aVar.name();
+                return new Assign(name, value);
+            }
+
+            error(equals, "Invalid assignment target.");
+        }
+        return expr;
     }
 
     private Expr equality() {
