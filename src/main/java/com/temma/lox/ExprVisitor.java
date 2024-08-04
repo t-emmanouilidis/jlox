@@ -19,4 +19,6 @@ interface ExprVisitor<U> {
     U visitAssignExpr(Assign assign);
 
 	U visitLogicalExpr(Logical logical);
+
+	U visitCallExpr(Call call);
 }

@@ -1,5 +1,7 @@
 package com.temma.lox;
 
+import java.util.stream.Collectors;
+
 class AstPrinter implements ExprVisitor<String> {
 
 	@Override
@@ -60,5 +62,11 @@ class AstPrinter implements ExprVisitor<String> {
 		Expr expression = new Binary(new Unary(new Token(TokenType.MINUS, "-", null, 1), new Literal(123)),
 				new Token(TokenType.STAR, "*", null, 1), new Grouping(new Literal(45.67)));
 		System.out.println(new AstPrinter().visit(expression));
+	}
+
+	@Override
+	public String visitCallExpr(Call call) {
+		String argsAsString = call.arguments().stream().map(this::visit).collect(Collectors.joining());
+		return visit(call.callee()) + "(" + argsAsString + ")";
 	}
 }

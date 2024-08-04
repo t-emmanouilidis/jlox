@@ -17,4 +17,6 @@ interface StmtVisitor {
 	void visitIfStmt(IfStmt ifStmt);
 
 	void visitWhileStmt(WhileStmt whileStmt);
+
+	void visitFunctionDecl(Function function);
 }
