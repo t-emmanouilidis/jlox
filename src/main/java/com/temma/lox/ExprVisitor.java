@@ -17,4 +17,6 @@ interface ExprVisitor<U> {
     U visitVariableExpr(Variable variable);
 
     U visitAssignExpr(Assign assign);
+
+	U visitLogicalExpr(Logical logical);
 }

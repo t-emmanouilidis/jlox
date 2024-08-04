@@ -13,4 +13,6 @@ interface StmtVisitor {
     void visitVariableDeclaration(VarDeclaration varDeclaration);
 
 	void visitBlock(Block block);
+
+	void visitIfStmt(IfStmt ifStmt);
 }

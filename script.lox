@@ -17,3 +17,13 @@ var c = "global c";
 print a;
 print b;
 print c;
+
+if ("1" or "2") {
+    print "yes";
+}
+
+if (false and "1") {
+    print "yes";
+} else {
+    print "no";
+}

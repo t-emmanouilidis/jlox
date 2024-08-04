@@ -133,6 +133,30 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 	public void visitBlock(Block block) {
 		executeBlock(block.stmts(), new Environment(environment));
 	}
+    
+    @Override
+    public void visitIfStmt(IfStmt ifStmt) {
+    	if (isTruthy(evaluate(ifStmt.condition()))) {
+    		execute(ifStmt.thenBranch());
+    	} else if (ifStmt.elseBranch() != null) {
+    		execute(ifStmt.elseBranch());
+    	}
+    }
+    
+    @Override
+	public Object visitLogicalExpr(Logical expr) {
+    	Object left = evaluate(expr.left());
+    	if (expr.operator().type == TokenType.OR) {
+    		if (isTruthy(left)) {
+    			return left;
+    		}
+    	} else {
+    		if (!isTruthy(left)) {
+    			return left;
+    		}
+    	}
+		return evaluate(expr.right());
+	}
 
     private void executeBlock(List<Stmt> stmts, Environment environment) {
 		Environment previous = this.environment;
