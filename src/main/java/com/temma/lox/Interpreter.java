@@ -208,8 +208,17 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 	
 	@Override
 	public void visitFunctionDecl(Function declaration) {
-		LoxFunction function = new LoxFunction(declaration);
+		LoxFunction function = new LoxFunction(declaration, environment);
 		environment.define(declaration.name().lexeme, function);
+	}
+	
+	@Override
+	public void visitReturnStmt(ReturnStmt returnStmt) {
+		Object value = null;
+		if (returnStmt.value() != null) {
+			value = evaluate(returnStmt.value());
+		}
+		throw new Return(value);
 	}
 
 	void executeBlock(List<Stmt> stmts, Environment environment) {

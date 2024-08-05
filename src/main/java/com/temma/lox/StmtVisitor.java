@@ -19,4 +19,6 @@ interface StmtVisitor {
 	void visitWhileStmt(WhileStmt whileStmt);
 
 	void visitFunctionDecl(Function function);
+
+	void visitReturnStmt(ReturnStmt return1);
 }

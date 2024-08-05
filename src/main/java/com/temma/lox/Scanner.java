@@ -83,10 +83,10 @@ class Scanner {
                 addToken(matchNext('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
                 break;
             case '<':
-                addToken(matchNext('<') ? TokenType.LESS_EQUAL : TokenType.LESS);
+                addToken(matchNext('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
                 break;
             case '>':
-                addToken(matchNext('>') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+                addToken(matchNext('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
                 break;
             case '/':
                 if (matchNext('/')) {
