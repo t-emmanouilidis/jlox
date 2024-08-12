@@ -2,7 +2,7 @@ package com.temma.lox;
 
 import java.util.List;
 
-record LoxFunction(Function declaration, Environment closure) implements LoxCallable {
+record LoxFunction(Function declaration, Environment closure, boolean isInitializer) implements LoxCallable {
 
 	@Override
 	public Object call(Interpreter interpreter, List<Object> arguments) {
@@ -13,7 +13,13 @@ record LoxFunction(Function declaration, Environment closure) implements LoxCall
 		try {
 			interpreter.executeBlock(declaration.body(), environment);
 		} catch (Return returnValue) {
+			if (isInitializer) {
+				return closure.getAt(0, "this");
+			}
 			return returnValue.value;
+		}
+		if (isInitializer) {
+			return closure.getAt(0, "this");
 		}
 		return null;
 	}
@@ -21,6 +27,12 @@ record LoxFunction(Function declaration, Environment closure) implements LoxCall
 	@Override
 	public int arity() {
 		return declaration.params().size();
+	}
+	
+	LoxFunction bind(LoxInstance instance) {
+		Environment environment = new Environment(closure);
+		environment.define("this", instance);
+		return new LoxFunction(declaration, environment, isInitializer);
 	}
 
 	@Override

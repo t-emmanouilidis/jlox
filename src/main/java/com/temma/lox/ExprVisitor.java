@@ -21,4 +21,10 @@ interface ExprVisitor<U> {
 	U visitLogicalExpr(Logical logical);
 
 	U visitCallExpr(Call call);
+
+    U visitGetExpr(GetExpr getExpr);
+
+    U visitSetExpr(SetExpr setExpr);
+
+	U visitThisExpr(ThisExpr thisExpr);
 }

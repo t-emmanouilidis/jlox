@@ -21,4 +21,6 @@ interface StmtVisitor {
 	void visitFunctionDecl(Function function);
 
 	void visitReturnStmt(ReturnStmt return1);
+
+    void visitClassDecl(ClassStmt classStmt);
 }
