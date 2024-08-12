@@ -1,12 +1,15 @@
 package com.temma.lox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 
 	final Environment globals = new Environment();
 	private Environment environment = globals;
+	private final Map<Expr, Integer> locals = new HashMap<Expr, Integer>();
 	
 	Interpreter() {
 		globals.define("clock", new LoxCallable() {
@@ -130,12 +133,29 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 
 	@Override
 	public Object visitVariableExpr(Variable variable) {
-		return environment.get(variable.name());
+		return lookUpVariable(variable.name(), variable);
+	}
+
+	private Object lookUpVariable(Token name, Expr expr) {
+		Integer distance = locals.get(expr);
+		if (distance != null) {
+			return environment.getAt(distance, name.lexeme);
+		} else {
+			return globals.get(name);
+		}
 	}
 
 	@Override
 	public Object visitAssignExpr(Assign assign) {
 		Object value = evaluate(assign.value());
+
+		Integer distance = locals.get(assign);
+		if (distance != null) {
+			environment.assignAt(distance, assign.name(), value);
+		} else {
+			globals.assign(assign.name(), value);
+		}
+
 		environment.assign(assign.name(), value);
 		return value;
 	}
@@ -275,4 +295,9 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 		}
 		return true;
 	}
+
+	void resolve(Expr expr, int depth) {
+		locals.put(expr, depth);
+	}
+
 }
