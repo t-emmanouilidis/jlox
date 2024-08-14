@@ -27,4 +27,6 @@ interface ExprVisitor<U> {
     U visitSetExpr(SetExpr setExpr);
 
 	U visitThisExpr(ThisExpr thisExpr);
+
+    U visitSuperExpr(Super super1);
 }

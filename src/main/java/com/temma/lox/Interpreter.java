@@ -221,7 +221,7 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
         LoxCallable function = (LoxCallable) callee;
         if (arguments.size() != function.arity()) {
             throw new RuntimeError(call.paren(), "Expect " + function.arity() +
-                  " arguments but got " + arguments.size() + ".");
+                    " arguments but got " + arguments.size() + ".");
         }
         return function.call(this, arguments);
     }
@@ -243,15 +243,20 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 
     @Override
     public void visitClassDecl(ClassStmt classStmt) {
-    	Object superclass = null;
-    	if (classStmt.superclass() != null) {
-    		superclass = evaluate(classStmt.superclass());
-    		if (!(superclass instanceof LoxClass)) {
-    			throw new RuntimeError(classStmt.superclass().name(), "Superclass must be a class.");
-    		}
-    	}
-    	
+        Object superclass = null;
+        if (classStmt.superclass() != null) {
+            superclass = evaluate(classStmt.superclass());
+            if (!(superclass instanceof LoxClass)) {
+                throw new RuntimeError(classStmt.superclass().name(), "Superclass must be a class.");
+            }
+        }
+
         environment.define(classStmt.name().lexeme, null);
+
+        if (classStmt.superclass() != null) {
+            environment = new Environment(environment);
+            environment.define("super", superclass);
+        }
 
         Map<String, LoxFunction> methods = new HashMap<>();
         for (Function method : classStmt.methods()) {
@@ -260,6 +265,11 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
         }
 
         LoxClass klass = new LoxClass(classStmt.name().lexeme, (LoxClass) superclass, methods);
+
+        if (classStmt.superclass() != null) {
+            environment = environment.enclosing;
+        }
+
         environment.assign(classStmt.name(), klass);
     }
 
@@ -282,10 +292,10 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
         ((LoxInstance) object).set(setExpr.name(), value);
         return value;
     }
-    
+
     @Override
     public Object visitThisExpr(ThisExpr thisExpr) {
-    	return lookUpVariable(thisExpr.keyword(), thisExpr);
+        return lookUpVariable(thisExpr.keyword(), thisExpr);
     }
 
     void executeBlock(List<Stmt> stmts, Environment environment) {
@@ -347,5 +357,18 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
         locals.put(expr, depth);
     }
 
+    @Override
+    public Object visitSuperExpr(Super superExpr) {
+        int distance = locals.get(superExpr);
+        LoxClass superclass = (LoxClass) environment.getAt(distance, "super");
+
+        LoxInstance object = (LoxInstance) environment.getAt(distance - 1, "this");
+        LoxFunction method = superclass.findMethod(superExpr.method().lexeme);
+
+        if (method == null) {
+            throw new RuntimeError(superExpr.method(), "Undefined property '" + superExpr.method().lexeme + "'.");
+        }
+        return method.bind(object);
+    }
 
 }

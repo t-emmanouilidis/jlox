@@ -122,7 +122,13 @@ class Resolver implements ExprVisitor<Void>, StmtVisitor {
 		}
 		
 		if (classStmt.superclass() != null) {
+			currentClass = ClassType.SUBCLASS;
 			resolve(classStmt.superclass());
+		}
+
+		if (classStmt.superclass() != null) {
+			beginScope();
+			scopes.peek().put("super", true);
 		}
 		
 		beginScope();
@@ -137,6 +143,10 @@ class Resolver implements ExprVisitor<Void>, StmtVisitor {
 		}
 		
 		endScope();
+
+		if (classStmt.superclass() != null) {
+			endScope();
+		}
 		
 		currentClass = enclosingClass;
 	}
@@ -254,7 +264,20 @@ class Resolver implements ExprVisitor<Void>, StmtVisitor {
 	
 	private enum ClassType {
 		NONE,
-		CLASS
+		CLASS,
+		SUBCLASS
+	}
+
+	@Override
+	public Void visitSuperExpr(Super superExpr) {
+		if (currentClass == ClassType.NONE) {
+			Lox.error(superExpr.keyword(), "Can't use 'super' outside a class.");
+		}
+		if (currentClass != ClassType.SUBCLASS) {
+			Lox.error(superExpr.keyword(), "Can't use 'super' in a class with not superclass.");
+		}
+		resolveLocal(superExpr, superExpr.keyword());
+		return null;
 	}
 	
 }
