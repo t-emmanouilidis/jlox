@@ -117,6 +117,14 @@ class Resolver implements ExprVisitor<Void>, StmtVisitor {
 		declare(classStmt.name());
 		define(classStmt.name());
 		
+		if (classStmt.superclass() != null && classStmt.name().lexeme.equals(classStmt.superclass().name().lexeme)) {
+			Lox.error(classStmt.superclass().name(), "A class can't inherit from itself.");
+		}
+		
+		if (classStmt.superclass() != null) {
+			resolve(classStmt.superclass());
+		}
+		
 		beginScope();
 		scopes.peek().put("this", true);
 		

@@ -243,6 +243,14 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
 
     @Override
     public void visitClassDecl(ClassStmt classStmt) {
+    	Object superclass = null;
+    	if (classStmt.superclass() != null) {
+    		superclass = evaluate(classStmt.superclass());
+    		if (!(superclass instanceof LoxClass)) {
+    			throw new RuntimeError(classStmt.superclass().name(), "Superclass must be a class.");
+    		}
+    	}
+    	
         environment.define(classStmt.name().lexeme, null);
 
         Map<String, LoxFunction> methods = new HashMap<>();
@@ -251,7 +259,7 @@ class Interpreter implements ExprVisitor<Object>, StmtVisitor {
             methods.put(method.name().lexeme, function);
         }
 
-        LoxClass klass = new LoxClass(classStmt.name().lexeme, methods);
+        LoxClass klass = new LoxClass(classStmt.name().lexeme, (LoxClass) superclass, methods);
         environment.assign(classStmt.name(), klass);
     }
 
